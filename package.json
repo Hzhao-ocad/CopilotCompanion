@@ -1,0 +1,111 @@
+{
+  "name": "copilot-progress-reporter",
+  "displayName": "Copilot Progress Reporter",
+  "description": "Reports Copilot agent task progress to an external backend endpoint.",
+  "version": "0.1.0",
+  "publisher": "local-dev",
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "tool",
+    "progress",
+    "telemetry"
+  ],
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "files": [
+    "out/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "activationEvents": [
+    "onLanguageModelTool:reportProgress"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Copilot Progress Reporter",
+      "properties": {
+        "copilotReporter.endpoint": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "HTTP(S) endpoint that receives POST requests with Copilot progress events."
+        }
+      }
+    },
+    "languageModelTools": [
+      {
+        "name": "reportProgress",
+        "displayName": "Report Progress",
+        "toolReferenceName": "reportProgress",
+        "userDescription": "Sends Copilot task progress events to a configured backend endpoint.",
+        "modelDescription": "Reports the current progress of an agentic task to an external backend. Call this when the task starts, after each step in the todo list is completed, and when the full task is finished.",
+        "canBeReferencedInPrompt": true,
+        "tags": [
+          "copilot",
+          "progress",
+          "reporting"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "event": {
+              "type": "string",
+              "enum": [
+                "task_start",
+                "step_complete",
+                "task_finish"
+              ],
+              "description": "Progress event type."
+            },
+            "stepCurrent": {
+              "type": "number",
+              "description": "Current step number in the task flow."
+            },
+            "stepTotal": {
+              "type": "number",
+              "description": "Total number of steps in the task flow."
+            },
+            "stepLabel": {
+              "type": "string",
+              "description": "Short description of the current step."
+            },
+            "taskSummary": {
+              "type": "string",
+              "description": "One-line summary of the overall task."
+            }
+          },
+          "required": [
+            "event",
+            "stepCurrent",
+            "stepTotal",
+            "stepLabel",
+            "taskSummary"
+          ],
+          "additionalProperties": false
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --allow-missing-repository",
+    "publish:marketplace": "vsce publish --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.2",
+    "@types/node": "^22.15.30",
+    "@types/vscode": "^1.100.0",
+    "typescript": "^5.9.3"
+  }
+}

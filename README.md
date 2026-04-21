@@ -56,26 +56,35 @@ code --install-extension copilot-progress-reporter-0.1.0.vsix
 
 4. Open Extensions and confirm Copilot Progress Reporter is enabled.
 
-## Local end-to-end test
+## ESP32-S3 Receiver (Arduino)
 
-1. Start the local receiver in the main workspace terminal:
+This repo includes an ESP32-S3 sketch at:
 
-```bash
-python app.py
-```
+`arduino/esp32s3_progress_receiver/esp32s3_progress_receiver.ino`
 
-2. In VS Code, choose the `Run Copilot Progress Reporter` debug profile and run it (F5).
-3. In the Extension Development Host, open Copilot Chat and run an agentic task that can call tools.
-4. Ask Copilot to use `#reportProgress` while executing the task steps.
-5. Verify incoming JSON payloads are printed in the terminal that runs `app.py`.
+The board hosts an HTTP server and accepts:
 
-The default workspace endpoint is already configured in `.vscode/settings.json` as:
+- `POST /copilot/progress` (JSON payload from this extension)
+- `POST /print-text` (plain text)
+
+Setup steps:
+
+1. Open the sketch in Arduino IDE.
+2. Set `WIFI_SSID` and `WIFI_PASSWORD` in the sketch.
+3. Select your ESP32-S3 board and upload.
+4. Open Serial Monitor at 115200 baud.
+5. Copy the printed board IP and set VS Code setting:
 
 ```json
 {
-  "copilotReporter.endpoint": "http://127.0.0.1:5000/copilot/progress"
+  "copilotReporter.endpoint": "http://<esp32-ip>/copilot/progress"
 }
 ```
+
+6. In VS Code, choose the `Run Copilot Progress Reporter` debug profile and run it (F5).
+7. In the Extension Development Host, open Copilot Chat and run an agentic task that can call tools.
+8. Ask Copilot to use `#reportProgress` while executing the task steps.
+9. Verify payloads in the ESP32 Serial Monitor.
 
 ## Publish To VS Code Marketplace
 
@@ -95,3 +104,20 @@ npm run publish:marketplace
 ```
 
 6. For updates, bump `version` in `package.json` and publish again.
+
+## Publish VSIX On GitHub Releases
+
+You can also distribute a VSIX for easy manual install:
+
+1. Build package:
+
+```bash
+npm run package
+```
+
+2. Upload the generated `.vsix` file to a GitHub Release.
+3. Users install with:
+
+```bash
+code --install-extension copilot-progress-reporter-<version>.vsix
+```
